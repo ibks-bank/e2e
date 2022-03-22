@@ -19,7 +19,7 @@ class ReadJson(object):
         self.second_name = None
 
     def read_json(self):
-        with open("api\\service_data\\configuration.json", "r") as read_file:
+        with open("api_profile\\service_data\\configuration.json", "r") as read_file:
             data = json.load(read_file)
             self.ip = data["ip"]
             self.port = data["port"]
