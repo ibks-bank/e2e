@@ -1,4 +1,5 @@
 from api_profile.conftest.conftest import clear_logger
+from api_profile.conftest.conftest import get_wrong_login_and_password
 from api_profile.service_data.read_json import ReadJson
 from framework.logger import Logger
 
@@ -6,24 +7,24 @@ import requests
 import json
 import random
 
-necessary_information = ReadJson()
-necessary_information.read_json()
+config = ReadJson()
+config.read_json()
 
-base_url = "http://{ip}:{port}/".format(ip=str(necessary_information.ip), port=str(necessary_information.port))
+base_url = "http://{ip}:{port}/".format(ip=str(config.ip), port=str(config.port))
 
 
 def test_successful_registration(clear_logger):
     Logger.logging_info_data("Test 1. Check API successful registration")
     path = "v1/auth/sign-up"
     data = {
-        "email": necessary_information.mail,
-        "password": necessary_information.password,
+        "email": "test" + config.mail,
+        "password": "test" + config.password,
         "passport": {
             "series": ''.join(str(item) for item in [random.randint(0, 9) for _ in range(4)]),
             "number": ''.join(str(item) for item in [random.randint(0, 9) for _ in range(6)]),
-            "firstName": necessary_information.first_name,
-            "middleName": necessary_information.second_name,
-            "lastName": necessary_information.second_name,
+            "firstName": config.first_name,
+            "middleName": config.second_name,
+            "lastName": config.second_name,
             "issuedBy": "RUSSIA",
             "issuedAt": "2000-01-01T16:53:20.724Z",
             "address": "St.Petersburg",
@@ -43,14 +44,14 @@ def test_unsuccessful_registration():
     Logger.logging_info_data("Test 2. Check API unsuccessful registration")
     path = "v1/auth/sign-up"
     data = {
-        "email": necessary_information.mail,
-        "password": necessary_information.password,
+        "email": config.mail,
+        "password": config.password,
         "passport": {
             "series": ''.join(str(item) for item in [random.randint(0, 9) for _ in range(4)]),
             "number": ''.join(str(item) for item in [random.randint(0, 9) for _ in range(6)]),
-            "firstName": necessary_information.first_name,
-            "middleName": necessary_information.second_name,
-            "lastName": necessary_information.second_name,
+            "firstName": config.first_name,
+            "middleName": config.second_name,
+            "lastName": config.second_name,
             "issuedBy": "RUSSIA",
             "issuedAt": "2000-01-01T16:53:20.724Z",
             "address": "St.Petersburg",
@@ -66,12 +67,12 @@ def test_unsuccessful_registration():
     Logger.logging_info_data("Test 2. PASS")
 
 
-def test_successful_sign_in():
+def test_successful_sign_in_without_code():
     Logger.logging_info_data("Test 3. Check API successful sign in")
     path = "v1/auth/sign-in"
     data = {
-        "email": necessary_information.mail,
-        "password": necessary_information.password,
+        "email": "test" + config.mail,
+        "password": "test" + config.password,
     }
 
     json_data = json.dumps(data, indent=4)
@@ -81,17 +82,80 @@ def test_successful_sign_in():
     Logger.logging_info_data("Test 3. PASS")
 
 
-def test_successful_sign_in():
-    Logger.logging_info_data("Test 4. Check API unsuccessful sign in")
+def test_unsuccessful_sign_in(get_wrong_login_and_password):
+    login, password = get_wrong_login_and_password
+    Logger.logging_info_data("Test 4. Check API unsuccessful sign in with login {} and password {}".format(login,
+                                                                                                           password))
     path = "v1/auth/sign-in"
     data = {
-        "email": necessary_information.mail,
-        "password": necessary_information.password,
+        "email": login,
+        "password": password,
     }
 
     json_data = json.dumps(data, indent=4)
     response = requests.post(url=base_url + path, json=json.loads(json_data))
     response_json = json.loads(response.text)
-    assert response.status_code == 200, Logger.logging_info_data("Test 4. FAILED")
-    Logger.logging_info_data("Test 4. PASS")
-    
+    assert response.status_code == 404, Logger.logging_info_data("Test 4. FAILED with login {} and password {}"
+                                                                 .format(login, password))
+    Logger.logging_info_data("Test 4. PASS with login {} and password {}".format(login, password))
+
+
+def test_full_successful_sign_in():
+    Logger.logging_info_data("Test 5. Check API full sign in")
+    Logger.logging_info_data("Sign up new user")
+    path = "v1/auth/sign-up"
+    data = {
+        "email": config.mail,
+        "password": config.password,
+        "passport": {
+            "series": ''.join(str(item) for item in [random.randint(0, 9) for _ in range(4)]),
+            "number": ''.join(str(item) for item in [random.randint(0, 9) for _ in range(6)]),
+            "firstName": config.first_name,
+            "middleName": config.second_name,
+            "lastName": config.second_name,
+            "issuedBy": "RUSSIA",
+            "issuedAt": "2000-01-01T16:53:20.724Z",
+            "address": "St.Petersburg",
+            "birthplace": "St.Petersburg",
+            "birthdate": "1990-01-01T16:53:20.724Z"
+        }
+    }
+
+    json_data = json.dumps(data, indent=4)
+    response = requests.post(url=base_url + path, json=json.loads(json_data))
+    response_json = json.loads(response.text)
+    assert response.status_code == 200, Logger.logging_info_data("Test 5. FAILED on sign up")
+    user_id = response_json["userID"]
+
+    Logger.logging_info_data("Sign in with new user")
+    path = "v1/auth/sign-in"
+    data = {
+        "email": config.mail,
+        "password": config.password,
+    }
+    json_data = json.dumps(data, indent=4)
+    response = requests.post(url=base_url + path, json=json.loads(json_data))
+    response_json = json.loads(response.text)
+    assert response.status_code == 200, Logger.logging_info_data("Test 5. FAILED with sign in")
+
+    Logger.logging_info_data("Getting code")
+    path = "v1/qa-api/set-code"
+    data = {
+        "code": "1234",
+        "userID": str(user_id)
+    }
+    json_data = json.dumps(data, indent=4)
+    response = requests.post(url=base_url + path, json=json.loads(json_data))
+    assert response.status_code == 200, Logger.logging_info_data("Test 5. FAILED with internal QA api")
+
+    Logger.logging_info_data("Enter user code")
+    path = "v1/auth/submit-code"
+    data = {
+        "email": config.mail,
+        "password": config.password,
+        "code": "1234"
+    }
+    json_data = json.dumps(data, indent=4)
+    response = requests.post(url=base_url + path, json=json.loads(json_data))
+    assert response.status_code == 200, Logger.logging_info_data("Test 5. FAILED with sending code to backend")
+    Logger.logging_info_data("Test 5. PASS")
