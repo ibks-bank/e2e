@@ -159,3 +159,14 @@ def test_full_successful_sign_in():
     response = requests.post(url=base_url + path, json=json.loads(json_data))
     assert response.status_code == 200, Logger.logging_info_data("Test 5. FAILED with sending code to backend")
     Logger.logging_info_data("Test 5. PASS")
+
+
+def test_get_passport():
+    Logger.logging_info_data("Test 6. Check API get passport")
+    path = "v1/passport"
+    headers = {
+        'X-Auth-Token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTA2NTE3NzUuMTg0NDYxLCJpYXQiOjE2NTA1NjUzNzUuMTg0NDYyLCJ1c2VybmFtZSI6ImJpcGFuazIyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMmIwNjU1ZGI1Zjk0NTM5OGJiOTIwZGNkYjVlNDc2NWVhOGUyYTgwYjQwYTQ3NjI0OTNiODUwZWI4Zjg4NTg5YiIsInVzZXJfaWQiOjd9.UwrL0qftUDeib6ePavloOU704mZHDkkpGeKOWJoh9I8'
+    }
+    request = requests.get(url=base_url + path, headers=headers)
+    assert request.status_code == 200, Logger.logging_info_data("Test 6. FAILED")
+    Logger.logging_info_data("Test 6. PASS")
