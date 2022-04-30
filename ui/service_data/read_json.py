@@ -16,3 +16,4 @@ class ReadJson(object):
         with open("ui\\service_data\\configuration.json", "r") as read_file:
             data = json.load(read_file)
             self.browser = data["browser"]
+            self.wait_time = data["wait_time"]
