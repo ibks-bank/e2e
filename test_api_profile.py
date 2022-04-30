@@ -1,5 +1,8 @@
+import ast
+
 from api_profile.conftest.conftest import clear_logger
 from api_profile.conftest.conftest import get_wrong_login_and_password
+from api_bank_account.conftest.conftest import registration
 from api_profile.service_data.read_json import ReadJson
 from framework.logger import Logger
 
@@ -161,11 +164,14 @@ def test_full_successful_sign_in():
     Logger.logging_info_data("Test 5. PASS")
 
 
-def test_get_passport():
+def test_get_passport(registration):
     Logger.logging_info_data("Test 6. Check API get passport")
     path = "v1/passport"
+    response = registration
+    token = response.content
+    token = ast.literal_eval(token.decode('utf-8'))
     headers = {
-        'X-Auth-Token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTA2NTE3NzUuMTg0NDYxLCJpYXQiOjE2NTA1NjUzNzUuMTg0NDYyLCJ1c2VybmFtZSI6ImJpcGFuazIyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMmIwNjU1ZGI1Zjk0NTM5OGJiOTIwZGNkYjVlNDc2NWVhOGUyYTgwYjQwYTQ3NjI0OTNiODUwZWI4Zjg4NTg5YiIsInVzZXJfaWQiOjd9.UwrL0qftUDeib6ePavloOU704mZHDkkpGeKOWJoh9I8'
+        'X-Auth-Token': str(token['token'])
     }
     request = requests.get(url=base_url + path, headers=headers)
     assert request.status_code == 200, Logger.logging_info_data("Test 6. FAILED")
