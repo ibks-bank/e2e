@@ -20,5 +20,3 @@ class ReadJson(object):
             data = json.load(read_file)
             self.ip = data["ip"]
             self.port = data["port"]
-            self.token = data["token"]
-            self.user_id = data["userId"]
