@@ -1,5 +1,7 @@
 {
   "browser" : ["Chrome", "Firefox"],
   "wait_time" : "10",
-  "url" : "http://bank.sytes.net:3030/login"
+  "url" : "http://bank.sytes.net:3030/login",
+  "name_browser": "0",
+  "name_local": "0"
 }

@@ -6,14 +6,21 @@ class ReadJson(object):
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
-            cls.instance = super(ReadJson, cls).__new__(cls)
+            cls.__instance = super(ReadJson, cls).__new__(cls)
         return cls.__instance
 
     def __init__(self):
+        self.wait_time = None
         self.browser = []
+        self.name_browser = None
+        self.url = ""
+        self.name_local = None
 
     def read_json(self):
         with open("ui\\service_data\\configuration.json", "r") as read_file:
             data = json.load(read_file)
             self.browser = data["browser"]
             self.wait_time = data["wait_time"]
+            self.name_browser = data["name_browser"]
+            self.name_local = data["name_local"]
+            self.url = data["url"]
