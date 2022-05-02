@@ -29,17 +29,22 @@ class RegistrationPage:
         self.middle_name.input_data(self.__name)
         self.last_name.input_data(self.__name)
         self.birthplace.input_data(self.__name)
-        self.birthdate.input_data("24.09.2000")
+        self.birthdate.input_data("24.10.2001")
 
     def continue_registration(self):
-        self.series.input_data("1111")
+        self.series.input_data("7777")
         self.number.input_data("222222")
         self.issued.input_data("MVD")
         self.issued_date.input_data("15.10.2010")
         self.address.input_data("SPB")
-        self.click_next()
+        self.click_registration()
 
     def click_next(self):
         self.next.set_element(self.next.find_element_by_xpath())
+        self.next.wait_element()
+        self.next.click_without_wait()
+
+    def click_registration(self):
+        self.next.set_element(self.next.find_elements_by_xpath()[1])
         self.next.wait_element()
         self.next.click_without_wait()

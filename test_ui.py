@@ -1,5 +1,3 @@
-import time
-
 from ui.conftest.conftest import clear_logger
 from ui.conftest.conftest import resource_setup
 from ui.service_data.read_json import ReadJson
@@ -46,9 +44,11 @@ def test_registration(resource_setup):
     home_page = resource_setup
     username = config.username
     password = config.password
+    Logger.logging_info_data("Test 4. Registration")
     home_page.click_registration()
     reg_page = RegistrationPage()
     reg_page.registration(username, password)
     reg_page.click_next()
     reg_page.continue_registration()
-    time.sleep(10)
+    assert home_page.check_login_page() is True, Logger.logging_info_data("Test 4. FAILED")
+    Logger.logging_info_data("Test 4. PASS")
