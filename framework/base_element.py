@@ -18,8 +18,8 @@ class BaseElement:
     def find_elements_by_xpath(self):
         return self.driver.get_driver().find_elements_by_xpath(self.locator)
 
-    def send_key(self):
-        return self.driver.get_driver()
+    def send_key(self, data):
+        self.find_element_by_xpath().send_keys(data)
 
     def find_element_by_xpath(self):
         return self.driver.get_driver().find_element_by_xpath(self.locator)

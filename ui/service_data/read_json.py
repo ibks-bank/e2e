@@ -15,6 +15,8 @@ class ReadJson(object):
         self.name_browser = None
         self.url = ""
         self.name_local = None
+        self.username = None
+        self.password = None
 
     def read_json(self):
         with open("ui\\service_data\\configuration.json", "r") as read_file:
@@ -24,3 +26,5 @@ class ReadJson(object):
             self.name_browser = data["name_browser"]
             self.name_local = data["name_local"]
             self.url = data["url"]
+            self.username = data["username"]
+            self.password = data["password"]
